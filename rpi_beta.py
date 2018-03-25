@@ -71,8 +71,9 @@ ip = "192.168.1.101"
 puerto = 5000
 ######################INICIO SENSORES##########################
 bateria = ina()
+b = bateria.read()
 time.sleep(1)
-print('Nivel de Bateria:'+ bateria.read() + 'V')
+print('Nivel de Bateria:', b , 'V')
 time.sleep(0.5)
 print(VERDE + '[OK]' + BLANCO +'INA en marcha...')
 gyro= Gyro(1)
@@ -98,7 +99,8 @@ for m in motores:
 	m.setW(10)
 	time.sleep(1)
 	m.setW(0)
-	print(m + 'armado')
+	print(m, 'armado')
+	
 print(VERDE + '[OK]' + BLANCO + 'motores armados')
 ##############################################################3
 
@@ -138,12 +140,13 @@ try:
                         roll= array[3]
                         yaw = array[1]
 
-                        error_pich =  pich - y
-                        error_roll = roll - x
-                        error_yaw = yaw - z
-                        final_pich = PID.calc(error_pich)
-                        final_roll = PID.calc(error_roll)
-                        final_yaw = PID.calc(error_yaw)
+                        PID.setPoint(pich)
+                        final_pich = PID.update(y)
+                        PID.setPoint(roll)
+                        final_roll = PID.update(x)
+                        PID.setPoint(yaw)
+                        final_yaw = PID.update(z)
+                        
                         motor1 = trothle - final_pich - final_roll + final_yaw
                         motor2 = trothle - final_pich + final_roll - final_yaw
                         motor3 = trothle + final_pich - final_roll - final_yaw
@@ -171,5 +174,5 @@ try:
                         esc4.setW(motor4)
 finally:
 
-for m in motores:
-	m.stop()
+	for m in motores:
+		m.stop()

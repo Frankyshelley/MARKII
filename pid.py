@@ -1,43 +1,58 @@
-from time import time,sleep
 
 
 class pid(object):
 
-    def __init__(self,kp=3,ki=0,kd=1,maxCorr=10):
-        self.kp = kp
-        self.ki = ki
-        self.kd = kd
-        self.previousTime = 0.0
-        self.I = 0
-        self.P =0
-        self.D = 0
-        self.previousError = 0.0
-        self.init=True
-        self.maxCorr=maxCorr
+        def __init__(self, P=2.0, I=0.0, D=1.0, Derivator=0, Integrator=0, Integrator_max=30, Integrator_min=0, maxcorr=30):
+                self.Kp=P
+                self.Ki=I
+                self.Kd=D
+                self.Derivator=Derivator
+                self.Integrator=Integrator
+                self.Integrator_max=Integrator_max
+                self.Integrator_min=Integrator_min
+                self.set_point=0.0
+                self.error=0.0
+                self.maxcorr= maxcorr
 
+        def update(self,current_value):
+                self.error = self.set_point - current_value
+                self.P_value = self.Kp * self.error
+                self.D_value = self.Kd * ( self.error - self.Derivator)
+                self.Derivator = self.error
+                self.Integrator = self.Integrator + self.error
 
-    def calc(self, error):
-        if self.init:
-            self.previousTime = time()
-            self.init=False
-            return 0
-        else:
-            currentTime = time()
-            stepTime = currentTime - self.previousTime
-
-            self.P = error * self.kp
-            self.I += (error * stepTime) * self.ki
-            self.D = (error - self.previousError) / stepTime * self.kd
-
-
-            correction = self.P + self.I + self.D
-            self.previousTime = currentTime
-            self.previousError = error
-            
-            correction = round(correction)
-
-            if correction>self.maxCorr:
-                correction=self.maxCorr
-            if correction<-self.maxCorr:
-                correction=-self.maxCorr
-            return correction
+                if self.Integrator > self.Integrator_max:
+                        self.Integrator = self.Integrator_max
+                elif self.Integrator < self.Integrator_min:
+                        self.Integrator = self.Integrator_min
+                        
+                self.I_value = self.Integrator * self.Ki
+                PID = self.P_value + self.I_value + self.D_value
+                correction = round(PID)
+                if correction > self.maxcorr:
+                        correction=self.maxcorr
+        
+        def setPoint(self,set_point):
+                self.set_point = set_point
+                self.Integrator=0
+                self.Derivator=0
+        def setIntegrator(self, Integrator):
+                self.Integrator = Integrator
+        def setDerivator(self, Derivator):
+                self.Derivator = Derivator
+        def setKp(self,P):
+                self.Kp=P
+        def setKi(self,I):
+                self.Ki=I
+        def setKd(self,D):
+                self.Kd=D
+        def setmaxcorr(self,maxcorr):
+                self.maxcorr= maxcorr
+        def getPoint(self):
+                return self.set_point
+        def getError(self):
+                return self.error
+        def getIntegrator(self):
+                return self.Integrator
+        def getDerivator(self):
+                return self.Derivator

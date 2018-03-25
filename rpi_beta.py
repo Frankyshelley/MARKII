@@ -72,12 +72,15 @@ puerto = 5000
 ######################INICIO SENSORES##########################
 bateria = ina()
 time.sleep(1)
-print('Nivel de Bateria:', bateria.read() + 'V')
+print('Nivel de Bateria:'+ bateria.read() + 'V')
 time.sleep(0.5)
 print(VERDE + '[OK]' + BLANCO +'INA en marcha...')
 gyro= Gyro(1)
 time.sleep(1)
-print(VERDE + '[OK]'+ BLANCO + 'gyro en marcha...')
+print(VERDE + '[OK]'+ BLANCO + 'gyro en marcha...', gyro.get_rotation())
+time.sleep(1)
+PID = pid()
+print(VERDE + '[OK]' + BLANCO + 'PID iniciado......')
 
 #####################MOTORES##################################
 
@@ -104,67 +107,69 @@ server.bind((ip, puerto))
 server.listen(5)
 
 
-
-while True:
-        cliente, direccion = server.accept()
-        print("Cliente conectado desde: ", direccion)
+try:
         while True:
-                g = gyro.get_rotation()
-                b = bateria.read()
-                x = g[0]
-                y = g[1]
-                z = g[2]
-                
-                if y <= -4: # quitar este if si cambias el MPU
-                	y = 0
-                if z <= -2:
-                	z = 0 
-                datos =[x,y,z,b]
+                cliente, direccion = server.accept()
+                print("Cliente conectado desde: ", direccion)
+                while True:
+                        g = gyro.get_rotation()
+                        b = bateria.read()
+                        x = g[0]
+                        y = g[1]
+                        z = g[2]
+                        
+                        if y <= -4: # quitar este if si cambias el MPU
+                        	y = 0
+                        if z <= -2:
+                        	z = 0 
+                        datos =[x,y,z,b]
 
-                timon = cliente.recv(4096)
-                array = pickle.loads(timon)
-                envio = pickle.dumps(datos)
-                cliente.send(envio)
+                        timon = cliente.recv(4096)
+                        array = pickle.loads(timon)
+                        envio = pickle.dumps(datos)
+                        cliente.send(envio)
 
-                
-                trothle = array[0]
-                if trothle < 0:
-                	trothle = 0
+                        
+                        trothle = array[0]
+                        if trothle < 0:
+                        	trothle = 0
 
-                pich = array[2]
-                roll= array[3]
-                yaw = array[1]
+                        pich = array[2]
+                        roll= array[3]
+                        yaw = array[1]
 
-                error_pich =  pich - y
-                error_roll = roll - x
-                error_yaw = yaw - z
-                final_pich = pid.calc(error_pich)
-                final_roll = pid.calc(error_roll)
-                final_yaw = pid.calc(error_yaw)
-                motor1 = trothle - final_pich - final_roll + final_yaw
-                motor2 = trothle - final_pich + final_roll - final_yaw
-                motor3 = trothle + final_pich - final_roll - final_yaw
-                motor4 = trothle + final_pich + final_roll + final_yaw 
+                        error_pich =  pich - y
+                        error_roll = roll - x
+                        error_yaw = yaw - z
+                        final_pich = PID.calc(error_pich)
+                        final_roll = PID.calc(error_roll)
+                        final_yaw = PID.calc(error_yaw)
+                        motor1 = trothle - final_pich - final_roll + final_yaw
+                        motor2 = trothle - final_pich + final_roll - final_yaw
+                        motor3 = trothle + final_pich - final_roll - final_yaw
+                        motor4 = trothle + final_pich + final_roll + final_yaw 
 
-                if motor1 > 100:
-                	motor1 = 100
-                if motor2 > 100:
-                	motor2 = 100
-                if motor3 > 100:
-                	motor3 = 100
-                if motor4 > 100:
-                	motor4 = 100
-                if motor1 < 0:
-                	motor1 = 0
-                if motor2 < 0:
-                	motor2 = 0
-                if motor3 < 0:
-                	motor3 = 0
-                if motor4 < 0:
-                	motor4 = 0
-                esc1.setW(motor1)
-                esc2.setW(motor2)
-                esc3.setW(motor3)
-                esc4.setW(motor4)
+                        if motor1 > 100:
+                        	motor1 = 100
+                        if motor2 > 100:
+                        	motor2 = 100
+                        if motor3 > 100:
+                        	motor3 = 100
+                        if motor4 > 100:
+                        	motor4 = 100
+                        if motor1 < 10:
+                        	motor1 = 10
+                        if motor2 < 10:
+                        	motor2 = 10
+                        if motor3 < 10:
+                        	motor3 = 10
+                        if motor4 < 10:
+                        	motor4 = 10
+                        esc1.setW(motor1)
+                        esc2.setW(motor2)
+                        esc3.setW(motor3)
+                        esc4.setW(motor4)
+finally:
+
 for m in motores:
 	m.stop()

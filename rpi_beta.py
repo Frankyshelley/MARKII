@@ -112,19 +112,16 @@ print('Esperando Conexión..........')
 try:
         while True:
                 cliente, direccion = server.accept()
-                print("Cliente conectado desde: ", direccion)
-                motor.setWLimits(10,100)
+                print(VERDE + "Cliente conectado desde: ", direccion)
+                for m in motores:
+                	m.setWLimits(10,100)
                 while True:
                         g = gyro.get_rotation()
                         b = bateria.read()
                         x = g[0] * -1
                         y = g[1] * -1
                         z = g[2] * -1
-                        
-                        if y <= 4: # quitar este if si cambias el MPU
-                        	y = 0
-                        if z <= 2:
-                        	z = 0 
+
                         datos =[x,y,z,b]
 
                         timon = cliente.recv(4096)
@@ -140,18 +137,16 @@ try:
                         pich = array[2]
                         roll= array[3]
                         yaw = array[1]
-
                         
                         final_pich = PID.calc_pitch(y,pich)
-                        
                         final_roll = PID.calc_roll(x,roll)
-                     
                         final_yaw = PID.calc_yaw(z,yaw)
-                        
+                     
                         motor1 = trothle - final_pich - final_roll + final_yaw
                         motor2 = trothle - final_pich + final_roll - final_yaw
                         motor3 = trothle + final_pich - final_roll - final_yaw
                         motor4 = trothle + final_pich + final_roll + final_yaw
+
                         esc1.setW(motor1)
                         esc2.setW(motor2)
                         esc3.setW(motor3)

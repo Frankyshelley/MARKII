@@ -39,7 +39,7 @@ class pid(object):
             correction = self.minCorr
         return correction  
 
-def calc_roll(self, x, roll):
+    def calc_roll(self, x, roll):
         self.error_roll = roll - x
         self.P = self.kp * self.error_roll
         self.I += self.ki * self.error_roll
@@ -56,7 +56,7 @@ def calc_roll(self, x, roll):
             correction = self.minCorr
         return correction       
 
-def calc_yaw(self, z, yaw):
+    def calc_yaw(self, z, yaw):
         self.error_yaw = yaw - z
         self.P = self.kp * self.error_yaw
         self.I += self.ki * self.error_yaw

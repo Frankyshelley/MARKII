@@ -2,7 +2,7 @@
 
 class pid(object):
 
-        def __init__(self, P=2.0, I=0.0, D=1.0, Derivator=0, Integrator=0, Integrator_max=30, Integrator_min=0, maxcorr=30):
+        def __init__(self, P=2, I=0, D=1, Derivator=0, Integrator=0, Integrator_max=10, Integrator_min=-10):
                 self.Kp=P
                 self.Ki=I
                 self.Kd=D
@@ -10,16 +10,20 @@ class pid(object):
                 self.Integrator=Integrator
                 self.Integrator_max=Integrator_max
                 self.Integrator_min=Integrator_min
-                self.set_point=0.0
-                self.error=0.0
-                self.maxcorr= maxcorr
+                self.set_point_pich=0
+                self.error_pich=0
+                self.set_point_roll=0
+                self.error_roll=0
+                self.set_point_yaw=0
+                self.error_yaw=0
+                
 
-        def update(self,current_value):
-                self.error = self.set_point - current_value
-                self.P_value = self.Kp * self.error
-                self.D_value = self.Kd * ( self.error - self.Derivator)
-                self.Derivator = self.error
-                self.Integrator = self.Integrator + self.error
+        def update_pich(self,current_value_pich):
+                self.error_pich = self.set_point_pich - current_value_pich
+                self.P_value = self.Kp * self.error_pich
+                self.D_value = self.Kd * ( self.error_pich - self.Derivator)
+                self.Derivator = self.error_pich
+                self.Integrator = self.Integrator + self.error_pich
 
                 if self.Integrator > self.Integrator_max:
                         self.Integrator = self.Integrator_max
@@ -28,12 +32,55 @@ class pid(object):
                         
                 self.I_value = self.Integrator * self.Ki
                 PID = self.P_value + self.I_value + self.D_value
-                correction = round(PID)
-                if correction > self.maxcorr:
-                        correction=self.maxcorr
+                correction_pich = round(PID)
+                return correction_pich
         
-        def setPoint(self,set_point):
-                self.set_point = set_point
+        def setPoint_pich(self,set_point_pich):
+                self.set_point_pich = set_point_pich
+                self.Integrator=0
+                self.Derivator=0
+
+        def update_roll(self,current_value_roll):
+                self.error_roll = self.set_point_roll - current_value_roll
+                self.P_value = self.Kp * self.error_roll
+                self.D_value = self.Kd * ( self.error_roll - self.Derivator)
+                self.Derivator = self.error_roll
+                self.Integrator = self.Integrator + self.error_roll
+
+                if self.Integrator > self.Integrator_max:
+                        self.Integrator = self.Integrator_max
+                elif self.Integrator < self.Integrator_min:
+                        self.Integrator = self.Integrator_min
+                        
+                self.I_value = self.Integrator * self.Ki
+                PID = self.P_value + self.I_value + self.D_value
+                correction_roll = round(PID)
+                return correction_roll
+        
+        def setPoint_roll(self,set_point_roll):
+                self.set_point_roll = set_point_roll
+                self.Integrator=0
+                self.Derivator=0
+
+        def update_yaw(self,current_value_yaw):
+                self.error_yaw = self.set_point_yaw - current_value_yaw
+                self.P_value = self.Kp * self.error_yaw
+                self.D_value = self.Kd * ( self.error_yaw - self.Derivator)
+                self.Derivator = self.error_yaw
+                self.Integrator = self.Integrator + self.error_yaw
+
+                if self.Integrator > self.Integrator_max:
+                        self.Integrator = self.Integrator_max
+                elif self.Integrator < self.Integrator_min:
+                        self.Integrator = self.Integrator_min
+                        
+                self.I_value = self.Integrator * self.Ki
+                PID = self.P_value + self.I_value + self.D_value
+                correction_yaw = round(PID)
+                return correction_yaw
+        
+        def setPoint_yaw(self,set_point_yaw):
+                self.set_point_yaw = set_point_yaw
                 self.Integrator=0
                 self.Derivator=0
         def setIntegrator(self, Integrator):
@@ -48,10 +95,6 @@ class pid(object):
                 self.Kd=D
         def setmaxcorr(self,maxcorr):
                 self.maxcorr= maxcorr
-        def getPoint(self):
-                return self.set_point
-        def getError(self):
-                return self.error
         def getIntegrator(self):
                 return self.Integrator
         def getDerivator(self):

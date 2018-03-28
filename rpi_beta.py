@@ -35,7 +35,7 @@ except ImportError:
 	print(BLANCO +'Fallo en MPU')
 	sys.exit()
 import socket, pickle
-from pid import pid
+from pid2 import pid
 try:
 	from motor import motor
 except ImportError:
@@ -107,22 +107,23 @@ print(VERDE + '[OK]' + BLANCO + 'motores armados')
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((ip, puerto))
 server.listen(5)
-
+print('Esperando Conexión..........')
 
 try:
         while True:
                 cliente, direccion = server.accept()
                 print("Cliente conectado desde: ", direccion)
+                motor.setWLimits(10,100)
                 while True:
                         g = gyro.get_rotation()
                         b = bateria.read()
-                        x = g[0]
-                        y = g[1]
-                        z = g[2]
+                        x = g[0] * -1
+                        y = g[1] * -1
+                        z = g[2] * -1
                         
-                        if y <= -4: # quitar este if si cambias el MPU
+                        if y <= 4: # quitar este if si cambias el MPU
                         	y = 0
-                        if z <= -2:
+                        if z <= 2:
                         	z = 0 
                         datos =[x,y,z,b]
 
@@ -140,34 +141,17 @@ try:
                         roll= array[3]
                         yaw = array[1]
 
-                        PID.setPoint(pich)
-                        final_pich = PID.update(y)
-                        PID.setPoint(roll)
-                        final_roll = PID.update(x)
-                        PID.setPoint(yaw)
-                        final_yaw = PID.update(z)
+                        
+                        final_pich = PID.calc_pitch(y,pich)
+                        
+                        final_roll = PID.calc_roll(x,roll)
+                     
+                        final_yaw = PID.calc_yaw(z,yaw)
                         
                         motor1 = trothle - final_pich - final_roll + final_yaw
                         motor2 = trothle - final_pich + final_roll - final_yaw
                         motor3 = trothle + final_pich - final_roll - final_yaw
-                        motor4 = trothle + final_pich + final_roll + final_yaw 
-
-                        if motor1 > 100:
-                        	motor1 = 100
-                        if motor2 > 100:
-                        	motor2 = 100
-                        if motor3 > 100:
-                        	motor3 = 100
-                        if motor4 > 100:
-                        	motor4 = 100
-                        if motor1 < 10:
-                        	motor1 = 10
-                        if motor2 < 10:
-                        	motor2 = 10
-                        if motor3 < 10:
-                        	motor3 = 10
-                        if motor4 < 10:
-                        	motor4 = 10
+                        motor4 = trothle + final_pich + final_roll + final_yaw
                         esc1.setW(motor1)
                         esc2.setW(motor2)
                         esc3.setW(motor3)

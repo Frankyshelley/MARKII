@@ -13,7 +13,7 @@ class pid(object):
         self.error_pitch=0
         self.error_roll = 0
         self.error_yaw = 0
-        self.maxCorr=maxCorr
+        self.maxCorr= maxCorr
         self.minCorr = minCorr
         self.I_max= I_max
         self.I_min = I_min
@@ -71,4 +71,23 @@ class pid(object):
             correction = self.maxCorr
         elif correction < self.minCorr:
             correction = self.minCorr
-        return correction       
+        return correction
+    def pid_agresivo(self):
+    	self.maxCorr = 30
+    	self.minCorr = -30
+    def pid_normal(self):
+    	self.maxCorr= 10
+    	self.minCorr = -10
+    def setk(self,kp,ki,kd):
+    	self.kp = kp
+    	self.ki = ki
+    	self.kd = kd
+    def error(self, x,y,roll,pitch):
+    	error_p = pitch -y
+    	error_r = roll -x
+    	return [error_p,error_r]
+    	
+
+
+
+

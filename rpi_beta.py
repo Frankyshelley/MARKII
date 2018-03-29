@@ -114,11 +114,11 @@ try:
                 cliente, direccion = server.accept()
                 print(VERDE + "Cliente conectado desde: ", direccion)
                 for m in motores:
-                	m.setWLimits(10,100)
+                        m.setWLimits(10,100)
                 while True:
                         g = gyro.get_rotation()
                         b = bateria.read()
-                        x = g[0] * -1
+                        x = g[0] * -1 # giro esta montado al revés
                         y = g[1] * -1
                         z = g[2] * -1
 
@@ -130,14 +130,24 @@ try:
                         cliente.send(envio)
 
                         
-                        trothle = array[0]
+                        trothle = array[0] # en este modo no acepta valor negativo
                         if trothle < 0:
-                        	trothle = 0
+                                trothle = 0
 
                         pich = array[2]
                         roll= array[3]
                         yaw = array[1]
                         
+                        error= PID.error(x,y,roll,pich)
+
+                        if error[0] or error[1] > 30: # comprobar los valores de kp ki kd si hay que tocarlos
+                                PID.pid_agresivo()
+                        elif error[0] or error[1]< -30:
+                                PID.pid_agresivo()
+                        else:
+                                PID.pid_normal()
+
+
                         final_pich = PID.calc_pitch(y,pich)
                         final_roll = PID.calc_roll(x,roll)
                         final_yaw = PID.calc_yaw(z,yaw)

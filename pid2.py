@@ -23,7 +23,7 @@ class pid(object):
 
 
     def calc_pitch(self, y, pitch):
-        self.error_pitch = pitch - y
+        self.error_pitch = y - pitch
         self.P = self.kp * self.error_pitch
         self.I += self.ki * self.error_pitch
         if self.I > self.I_max:
@@ -40,7 +40,7 @@ class pid(object):
         return correction  
 
     def calc_roll(self, x, roll):
-        self.error_roll = roll - x
+        self.error_roll = x - roll
         self.P = self.kp * self.error_roll
         self.I += self.ki * self.error_roll
         if self.I > self.I_max:
@@ -57,7 +57,7 @@ class pid(object):
         return correction       
 
     def calc_yaw(self, z, yaw):
-        self.error_yaw = yaw - z
+        self.error_yaw = z - yaw
         self.P = self.kp * self.error_yaw
         self.I += self.ki * self.error_yaw
         if self.I > self.I_max:
@@ -83,8 +83,8 @@ class pid(object):
     	self.ki = ki
     	self.kd = kd
     def error(self, x,y,roll,pitch):
-    	error_p = pitch -y
-    	error_r = roll -x
+    	error_p = y - pitch
+    	error_r = x - roll
     	return [error_p,error_r]
     	
 

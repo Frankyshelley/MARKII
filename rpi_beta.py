@@ -99,8 +99,7 @@ for m in motores:
 	m.setW(10)
 	time.sleep(1)
 	m.setW(0)
-	print(m, 'armado')
-	
+		
 print(VERDE + '[OK]' + BLANCO + 'motores armados')
 ##############################################################3
 
@@ -116,11 +115,12 @@ try:
                 for m in motores:
                         m.setWLimits(10,100)
                 while True:
-                        g = gyro.get_rotation()
+                        t = time.time()
+                        g = gyro.get_rotation(t)
                         b = bateria.read()
-                        x = g[0] * -1 # giro esta montado al revés
-                        y = g[1] * -1
-                        z = g[2] * -1
+                        x = g[0]  # giro esta montado al revés
+                        y = g[1] 
+                        z = g[2] 
 
                         datos =[x,y,z,b]
 

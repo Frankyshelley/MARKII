@@ -11,6 +11,7 @@ class Gyro:
 		self.bus = smbus.SMBus(rev)
 		self.address = 0x68
 		self.bus.write_byte_data(self.address, self.power_1, 0)
+		self.dt = 0
 
 	def read_byte(self,adr):
 		return self.bus.read_byte_data(self.address, adr)
@@ -52,10 +53,15 @@ class Gyro:
 		elif mode == 1:
 			return [self.read_word_2c(0x3b)/16384.0,self.read_word_2c(0x3d)/16384.0,self.read_word_2c(0x3f)/16384.0]
 
-	def get_rotation(self):
+	def get_rotation(self,t):
 		accel_x, accel_y, accel_z = self.get_accel(1)
 		gyro_x, gyro_y, gyro_z = self.get_gyro(1)
 		x = int(self.get_x_rotation(accel_x, accel_y, accel_z))
 		y = int(self.get_y_rotation(accel_x, accel_y, accel_z))
 		z = int(gyro_z)
+		# FILTRO COMPLEMENTARIO
+		x = 0.98 * (x + gyro_x * dt) + 0.02 * accel_x
+		y = 0.98 * (y + gyro_y * dt) + 0.02 * accel_y
+		z = 0.98 * (z + gyro_z * dt) + 0.02 * accel_z
+		self.dt = time.time() - t
 		return [x,y,z]

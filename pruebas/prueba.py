@@ -78,10 +78,10 @@ print(VERDE + '[OK]' + BLANCO + 'motores armados')
 ##############################################################3
 a = input('al cielo:')
 
-    for m in motores:
+for m in motores:
         m.setW(10)
-    while True:
-        giro  = sensor.imu()
+while True:
+        giro  = gyro.imu()
         print(giro[0])
         print(giro[1])
         print(giro[2])

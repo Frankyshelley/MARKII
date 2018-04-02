@@ -85,6 +85,7 @@ while True:
         print(giro[0])
         print(giro[1])
         print(giro[2])
+        time.sleep(1)
 
    
 for m in motores:

@@ -133,7 +133,7 @@ try:
 
                         pitch = array[2]
                         roll= array[3]
-                        yaw = array[1]
+                        yaw = z + array[1]
                         
                         error= PID.error(x,y,roll,pitch)
 

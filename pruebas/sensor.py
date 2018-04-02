@@ -1,6 +1,7 @@
 import time
 import math
 import mpu6050
+from ina219 import INA219
 class sensor:
 
         def __init__(self):
@@ -9,6 +10,8 @@ class sensor:
                 self.mpu.setDMPEnabled(True)
                 self.packetSize = mpu.dmpGetFIFOPacketSize() 
                 self.ypr= {}
+                self.ina = INA219(shunt_ohms=0.1, max_expected_amps=1, address=0x40)
+                self.ina.configure(voltage_range=self.ina.RANGE_16V,bus_adc=self.ina.ADC_128SAMP,shunt_adc=self.ina.ADC_128SAMP)
 
         def imu(self):
         # Get INT_STATUS byte
@@ -41,5 +44,9 @@ class sensor:
                 return [x,y,z]
                 # track FIFO count here in case there is > 1 packet available
                 # (this lets us immediately read more without waiting for an interrupt)        
-                fifoCount -= self.packetSize  
+                fifoCount -= self.packetSize
+        def ina(self):
+            self.v = self.ina.voltage()
+            return self.v
+
 

@@ -39,11 +39,18 @@ except ImportError:
 	print(BLANCO +'fallo módulo motor')
 	sys.exit()
 try:
-	sensor = sensor()
-except:
-	print(ROJO + 'FALLO CRITICO')
-	print(BLANCO + 'Fallo módulo sensores')
-	sys.exit()
+	from MPU6050 import Gyro
+except ImportError:
+	print(ROJO+'FALLO CRITICO')
+	print(BLANCO+'fallo importacion IMU')
+try:
+	from INA import ina
+except ImportError:
+	print(ROJO+ 'FALLO CRITICO')
+	print(BLANCO+'fallo modulo bateria')
+
+
+
 
 
 #######################VARIABLES##############################
@@ -67,15 +74,17 @@ motor3 = 0
 motor4 = 0
 ip = "192.168.1.101"
 puerto = 5000
+t =0
 ######################INICIO SENSORES##########################
-bateria = sensor.ina()
+bateria = ina()
+
 time.sleep(1)
-print('Nivel de Bateria:', bateria , 'V')
+print('Nivel de Bateria: ',bateria.read(), 'V')
 time.sleep(0.5)
 print(VERDE + '[OK]' + BLANCO +'INA en marcha...')
-giro = sensor.imu()
+giro = Gyro(1)
 time.sleep(1)
-print(VERDE + '[OK]'+ BLANCO + 'gyro en marcha...', giro)
+print(VERDE + '[OK]'+ BLANCO + 'gyro en marcha...', giro.get_rotation(t))
 time.sleep(1)
 PID = pid()
 print(VERDE + '[OK]' + BLANCO + 'PID iniciado......')
@@ -111,10 +120,14 @@ try:
                 print(VERDE + "Cliente conectado desde: ", direccion)
                 for m in motores:
                         m.setWLimits(10,100)
+                init_t = time.time()
+                tot= 0
                 while True:
-         
-                        g = sensor.imu()
-                        b = sensor.ina()
+                        t_prev = tot
+                        tot = time.time()-init_t
+                        t = tot-t_prev
+                        g = giro.get_rotation(t)
+                        b = bateria.read()
                         x = g[0] 
                         y = g[1] 
                         z = g[2] 

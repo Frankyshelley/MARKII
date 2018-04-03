@@ -8,7 +8,7 @@ class sensor:
                 self.mpu = mpu6050.MPU6050()
                 self.mpu.dmpInitialize()
                 self.mpu.setDMPEnabled(True)
-                self.packetSize = mpu.dmpGetFIFOPacketSize() 
+                self.packetSize = self.mpu.dmpGetFIFOPacketSize() 
                 self.ypr= {}
                 self.ina = INA219(shunt_ohms=0.1, max_expected_amps=1, address=0x40)
                 self.ina.configure(voltage_range=self.ina.RANGE_16V,bus_adc=self.ina.ADC_128SAMP,shunt_adc=self.ina.ADC_128SAMP)
@@ -36,7 +36,7 @@ class sensor:
                 result = self.mpu.getFIFOBytes(self.packetSize)
                 q = self.mpu.dmpGetQuaternion(result)
                 g = self.mpu.dmpGetGravity(q)
-                ypr = self.mpu.dmpGetYawPitchRoll(q, g)
+                self.ypr = self.mpu.dmpGetYawPitchRoll(q, g)
                 
                 z =round(self.ypr['yaw'] * 180 / math.pi),
                 y =round(self.ypr['pitch'] * 180 / math.pi),

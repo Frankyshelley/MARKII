@@ -12,6 +12,9 @@ class Gyro:
 		self.address = 0x68
 		self.bus.write_byte_data(self.address, self.power_1, 0)
 		self.dt = 0
+		self.x_prev = 0
+		self.y_prev = 0
+		self.z_prev = 0
 
 	def read_byte(self,adr):
 		return self.bus.read_byte_data(self.address, adr)
@@ -60,8 +63,11 @@ class Gyro:
 		y = int(self.get_y_rotation(accel_x, accel_y, accel_z))
 		z = int(gyro_z)
 		# FILTRO COMPLEMENTARIO
-		x = 0.98 * (x + gyro_x * dt) + 0.02 * accel_x
-		y = 0.98 * (y + gyro_y * dt) + 0.02 * accel_y
-		z = 0.98 * (z + gyro_z * dt) + 0.02 * accel_z
+		x = 0.98 * (self.x_prev + gyro_x * dt) + (0.02 * accel_x)
+		y = 0.98 * (self.y_prev + gyro_y * dt) + (0.02 * accel_y)
+		z = 0.98 * (self.z_prev + gyro_z * dt) + (0.02 * accel_z)
+		self.x_prev = x
+		self.y_prev = y
+		self.z_prev = z
 		self.dt = time.time() - t
 		return [x,y,z]

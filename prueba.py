@@ -56,7 +56,7 @@ time.sleep(0.5)
 print(VERDE + '[OK]' + BLANCO +'INA en marcha...')
 giro = Gyro(1)
 time.sleep(1)
-print(VERDE + '[OK]'+ BLANCO + 'gyro en marcha...', giro.get_rotation(t))
+print(VERDE + '[OK]'+ BLANCO + 'gyro en marcha...', giro.get_gyroffset())
 time.sleep(1)
 PID = pid()
 print(VERDE + '[OK]' + BLANCO + 'PID iniciado......')
@@ -101,7 +101,6 @@ try:
                 x = g[0] 
                 y = g[1] 
                 z = g[2] 
-
                 datos =[x,y,z,b]
                 print(datos)
                 time.sleep(1)

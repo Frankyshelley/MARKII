@@ -58,19 +58,19 @@ class Gyro:
 
 	def get_rotation(self,t):
 		accel_x, accel_y, accel_z = self.get_accel(1)
-		gyro_x, gyro_y, gyro_z = self.get_gyro(0)
-		gx = (gyro_x - self.x_prev)/131
-		gy = (gyro_y - self.y_prev)/131
-		gz = (gyro_z - self.z_prev)/131
-		x = int(self.get_x_rotation(accel_x, accel_y, accel_z))
-		y = int(self.get_y_rotation(accel_x, accel_y, accel_z))
-		z = int(gz)
+		gyro_x, gyro_y, gyro_z = self.get_gyro(1)
+		#x = int(self.get_x_rotation(accel_x, accel_y, accel_z))
+		#y = int(self.get_y_rotation(accel_x, accel_y, accel_z))
+		#z = int(gyro_z)
 		# FILTRO COMPLEMENTARIO
-		x = 0.98 * (x + (gx * dt)) + (0.02 * accel_x)
-		y = 0.98 * (y + (gy * dt)) + (0.02 * accel_y)
-		z = 0.98 * (z + (gz * dt)) + (0.02 * accel_z)
+		x = 0.98 * (x_prev + gyro_x * dt) + (0.02 * accel_x)
+		y = 0.98 * (y_prev + gyro_y * dt) + (0.02 * accel_y)
+		z = 0.98 * (z_prev + gyro_z* dt) + (0.02 * accel_z)
+		x_prev = x
+		y_prev = y
+		z_prev = z
 		self.dt = time.time() - t
 		return [x,y,z]
 	def get_gyroffset(self):
-		self.x_prev,self.y_prev,self.z_prev = self.get_gyro(0)
+		self.x_prev,self.y_prev,self.z_prev = self.get_gyro(1)
 

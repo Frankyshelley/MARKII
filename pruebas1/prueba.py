@@ -58,9 +58,11 @@ motor4 = 0
 ip = "192.168.1.101"
 puerto = 5000
 z_prev = 0
+x_prev = 0
+y_prev = 0
 ######################INICIO SENSORES##########################
 gyro = sensor()
-time.sleep(2)
+time.sleep(3)
 print(VERDE +'[OK]'+ BLANCO +'sensores Activos...')
 #####################MOTORES##################################
 
@@ -73,22 +75,28 @@ motores = [esc1, esc2, esc3, esc4]
 for m in motores:
 	m.start()
 	m.setW(0)
-	
-		
+			
 print(VERDE + '[OK]' + BLANCO + 'motores armados')
 ##############################################################3
 a = input('al cielo:')
 for m in motores:
         m.setW(10)
 while True:
-        giro  = gyro.imu()
-        z_imu= int(giro[2])
-        z = z_imu - z_prev
-        z_prev = z
-        x = int(giro[0])
-        y = int(giro[1])
-        print('ROLL|PITCH|YAW')
-        print(x,y,z)
+	try:
+		giro  = gyro.imu()
+		x = int(giro[0])
+		y = int(giro[1])
+		z = int(giro[2])
+		if Type(x) and Type(y) and Type(z) == int:
+			x_prev = x
+			y_prev = y
+			z_prev = z
+	except TypeError:
+		x = x_prev
+		y = y_prev
+		z = z_prev
+	print(x,y,z)
+      	
  
 for m in motores:
         m.stop()

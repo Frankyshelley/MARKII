@@ -35,8 +35,8 @@ class sensor:
                 g = self.mpu.dmpGetGravity(q)
                 self.ypr = self.mpu.dmpGetYawPitchRoll(q, g)
                 
-                z =round(self.ypr['yaw'] * 180 / math.pi),
-                y =round(self.ypr['pitch'] * 180 / math.pi),
+                
+                y =round(self.ypr['pitch'] * 180 / math.pi)
                 x =round(self.ypr['roll'] * 180 / math.pi)
                 return [x,y,z]
                        

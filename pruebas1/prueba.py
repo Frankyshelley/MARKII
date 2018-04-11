@@ -86,15 +86,14 @@ while True:
 		giro  = gyro.imu()
 		x = int(giro[0])
 		y = int(giro[1])
-		z = int(giro[2])
-		if Type(x) and Type(y) and Type(z) == int:
+		
+		if type(x) and type(y) and type(z) == int:
 			x_prev = x
 			y_prev = y
-			z_prev = z
+			
 	except TypeError:
 		x = x_prev
 		y = y_prev
-		z = z_prev
 	print(x,y,z)
       	
  

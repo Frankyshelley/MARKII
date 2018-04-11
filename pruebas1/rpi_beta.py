@@ -40,6 +40,7 @@ except ImportError:
 	sys.exit()
 try:
 	sensor = sensor()
+	print(VERDE +'[OK]' + BLANCO +' Sensores iniciados')
 except:
 	print(ROJO + 'FALLO CRITICO')
 	print(BLANCO + 'Fallo módulo sensores')
@@ -106,20 +107,29 @@ server.listen(5)
 print('Esperando Conexión..........')
 
 try:
+        
         while True:
                 cliente, direccion = server.accept()
                 print(VERDE + "Cliente conectado desde: ", direccion)
                 for m in motores:
                         m.setWLimits(10,100)
                 while True:
-         
-                        g = sensor.imu()
-                        b = sensor.ina()
-                        x = g[0] 
-                        y = g[1] 
-                        z = g[2] 
+                        try:
+                                giro  = sensor.imu()
+                                b = sensor.ina()
+                                x = int(giro[0])
+                                y = int(giro[1])
 
-                        datos =[x,y,z,b]
+
+                                if type(x) and type(y) and type(z) == int:
+                                        x_prev = x
+                                        y_prev = y
+                                        
+                        except TypeError:
+                                x = x_prev
+                                y = y_prev
+
+                        datos =[x,y,b]
 
                         timon = cliente.recv(4096)
                         array = pickle.loads(timon)
@@ -133,7 +143,7 @@ try:
 
                         pitch = array[2]
                         roll= array[3]
-                        yaw = z + array[1]
+                        yaw =  array[1]
                         
                         error= PID.error(x,y,roll,pitch)
 
@@ -147,7 +157,7 @@ try:
 
                         final_pich = PID.calc_pitch(y,pitch)
                         final_roll = PID.calc_roll(x,roll)
-                        final_yaw = PID.calc_yaw(z,yaw)
+                        final_yaw = yaw
                      
                         motor1 = trothle - final_pich - final_roll + final_yaw
                         motor2 = trothle - final_pich + final_roll - final_yaw

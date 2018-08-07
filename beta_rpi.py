@@ -1,10 +1,7 @@
 import socket,pickle
 import time
-import sys
 import select
-import subprocess
 from INA import ina
-import threading
 from pymultiwii import MultiWii
 
 
@@ -26,10 +23,13 @@ ina= ina()
 serialport = '/dev/ttyUSB0'
 placa = MultiWii(serialport)
 print 'conexion placa NAZE32 establecida', serialport
+roll = 1500
+pitch = 1500
+yaw = 1500
+trothle = 1000
 
-
-UDP_IP = '192.168.1.101'
-UDP_PORT = '10000'
+UDP_IP = '0.0.0.0'
+UDP_PORT = 10000
 UDP_HOST = '192.168.1.36'
 sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 sock.bind( (UDP_IP,UDP_PORT) )
@@ -40,16 +40,7 @@ arm= 0
 
 print 'Iniciando bucle principal'
 while Done == False:
-	HayDatosSocket = select.select([sock],[],[],0.5)
-	if HayDatosSocket[0]:
-		Socketdata = sock.recv(bufer)  
-		mando = pickle.loads(Socketdata)
-	roll = ROLL + mando[3]
-	pitch = PITCH + mando[2]
-	yaw = YAW + mando[1]
-	trothle = TROTHLE + mando[0]
-	boton_up = mando[5]
-	boton_down = mando[4]
+	
 	bat = ina.read()
 	if boton_up == 12 and arm == 0:
 		placa.arm()
@@ -73,7 +64,17 @@ while Done == False:
 		z = int(placa.attitude['heading'])
 		array = [x,y,z,bat]
 		msg = pickle.dumps(array)
-		sock.sendto(msg, (self.UDP_HOST, self.UDP_PORT))
+		sock.sendto(msg, (UDP_HOST,UDP_PORT))
+	HayDatosSocket = select.select([sock],[],[],0.5)
+	if HayDatosSocket[0]:
+		Socketdata = sock.recv(bufer)  
+		mando = pickle.loads(Socketdata)
+	roll = ROLL + mando[3]
+	pitch = PITCH + mando[2]
+	yaw = YAW + mando[1]
+	trothle = TROTHLE + mando[0]
+	boton_up = mando[5]
+	boton_down = mando[4]
 
 
 sock.close()

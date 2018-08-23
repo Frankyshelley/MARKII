@@ -1,6 +1,7 @@
 import socket,pickle
 import time
 import select
+import subprocess
 from INA import ina
 from pymultiwii import MultiWii
 
@@ -15,10 +16,7 @@ YAW = 1500
 TROTHLE = 1000
 Done = False
 mando =[0,0,0,0,0,0]
-print 'lanzando video.......'
-subprocess.call('bash stream.sh', shell =True)
-time.sleep(2)
-print 'video lanzado'
+
 ina= ina()
 serialport = '/dev/ttyUSB0'
 placa = MultiWii(serialport)
@@ -30,13 +28,19 @@ trothle = 1000
 
 UDP_IP = '0.0.0.0'
 UDP_PORT = 10000
-UDP_HOST = '192.168.1.36'
+UDP_HOST = '192.168.1.121'
 sock = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
 sock.bind( (UDP_IP,UDP_PORT) )
 sock.setblocking(0)
 bufer = 2048
 print 'Socket udp creado con exito'
 arm= 0
+roll = ROLL + mando[3]
+pitch = PITCH + mando[2]
+yaw = YAW + mando[1]
+trothle = TROTHLE + mando[0]
+boton_up = mando[5]
+boton_down = mando[4]
 
 print 'Iniciando bucle principal'
 while Done == False:

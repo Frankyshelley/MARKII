@@ -9,6 +9,7 @@ sudo apt-get install python pyserial
 sudo apt install python-smbus
 pip install psutil
 pip install commands
+sudo pip install pi-ina219
 #############################################
 # video
 echo " Instalando video"
